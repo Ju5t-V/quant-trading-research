@@ -1,0 +1,11 @@
+# plan v2 step 2b: min(ratio A, ratio B) of 2a = {'1A': -0.752, '3A': -0.823, '2A': -0.877} -> B* = 1A {'levels': 'PDH_PDL', 'arm_hour': 0, 'arm_minute': 5}
+--name E1 --window A --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E2 --window A --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E3 --window A --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E4 --window A --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name R --window A --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E1 --window B --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E2 --window B --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E3 --window B --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name E4 --window B --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name R --window B --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5

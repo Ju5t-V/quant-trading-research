@@ -1,0 +1,13 @@
+start name_1A_window_A_stress_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+start name_1A_window_B_stress_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+start name_1A_window_A_raw_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+done  name_1A_window_B_stress_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  420s
+start name_1A_window_B_raw_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+done  name_1A_window_B_raw_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  415s
+start name_0b_window_A_raw
+done  name_1A_window_A_raw_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  1055s
+start name_0b_window_B_raw
+done  name_1A_window_A_stress_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  1071s
+done  name_0b_window_B_raw  exit=0  500s
+done  name_0b_window_A_raw  exit=0  1000s
+all done in 1851s

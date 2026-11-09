@@ -1,0 +1,4 @@
+{"tag": "1_A_2026-01_2026-01", "quotes": 18445617, "seconds": 161.7, "strategy_stats": {"days": 21, "spread_waits": 0, "days_skipped_spread": 0, "entries_placed": 42, "entry_rejected": 0, "entry_expired": 18, "modify_rejected": 1, "exit_rejected": 1, "open_at_end": 0}}
+{"trades": 23, "win_pct": 60.9, "scratch_pct": 4.3, "pf": 1.985, "net_R": 8.23, "exp_R": 0.358, "avg_win_R": 1.186, "avg_loss_R": -0.929, "max_dd_R": 7.01, "net_usd_at_1pct": 823.0, "max_dd_pct_at_1pct": 7.0, "net_usd_actual": 823.0, "min_equity_actual": 9498.0, "max_dd_usd_actual": 701.0, "swap_R_est": 0.0, "overnight_pct": 0.0, "median_hold_min": 14.8, "days_two_trades": 2, "tp1_hit_pct": 65.2, "buy_n": 17, "buy_win_pct": 64.7, "buy_net_R": 7.27, "buy_pf": 2.383, "sell_n": 6, "sell_win_pct": 50.0, "sell_net_R": 0.97, "sell_pf": 1.311}
+ year  trades  win_pct   pf  net_R
+ 2026      23     60.9 1.98    8.2

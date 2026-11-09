@@ -1,0 +1,101 @@
+==================== FULL PROMPT (paste into any new Claude session) ====================
+
+I want you to build and validate an AUTOMATED trading strategy for: [INSTRUMENT - e.g. XAUUSD, USTEC, QQQ, SPY, EURUSD]
+
+About me: I'm not a coder - you write and run all code yourself and explain results in
+plain language with tables. My setup: Windows 11, MetaTrader 5 (MetaQuotes demo) at
+C:\Program Files\MetaTrader 5, Python venv at "E:\Documents\Quant Trading\.venv" (pandas,
+matplotlib, yfinance, MetaTrader5 installed). Careful: I may have a live forward test
+running in MT5 - ask me before closing my terminal.
+
+What I want:
+
+1. Propose a strategy that fits this instrument's character (any style - breakout, trend,
+   mean reversion - whatever the data supports). Fully automated:
+   - MT5 instrument (forex/metal/index CFD): write an MQL5 EA, compile via metaeditor64
+     CLI, backtest in the MT5 Strategy Tester on REAL TICKS.
+   - US ETF/stock end-of-day: use Python + Yahoo Finance daily data instead (next-day-open
+     fills, 0.1% cost per side). MT5 stock data is too shallow and CFDs add financing costs.
+
+2. Backtest in SECTIONS, each starting fresh with $10,000: 2020-2022, 2023-2024, 2025-now,
+   plus the longest history available. Report per section: net profit, profit factor,
+   win rate, max drawdown, trade count - and buy-and-hold comparison for ETFs/indices.
+
+3. Test variants honestly (entry timing, stops, trails, filters). Pick the most ROBUST,
+   not the best-looking backtest. Tell me openly: which market regimes does it lose in,
+   what's the overfitting risk, and what should live results look like if it's working
+   (and if it's broken).
+
+4. Risk management built in: auto position sizing at 2% risk per trade computed with
+   OrderCalcProfit (broker tick-value fields can be wrong 10x), a free-margin cap so
+   orders can never be rejected for margin, and a recovery mode that cuts size to 1/10
+   while the last 10 closed trades are net negative. Volatility-scale all point-based
+   distances by daily ATR(14) vs a reference, with sane floors above spread. No leverage
+   and no shorting for ETFs.
+
+5. EA safety requirements: restart-safe (after MT5 reopens mid-day it must NOT re-place
+   orders it already placed - check today's orders/positions/deals by magic number first),
+   SL/TP always on the server, and an on-chart info panel showing levels, order status,
+   risk mode and next lot size.
+
+6. Ship it: compiled EA installed to my terminal's Experts folder, source + all backtest
+   reports archived in a project folder, README with the rules and honest expectations.
+
+MT5 tester automation gotchas (handle these - they cost us days):
+- CLI: terminal64.exe /config:<ini> with a [Tester] section. Expert name WITHOUT the
+  "Experts\" prefix. Model=4 = real ticks (check "History Quality" in the report).
+  ShutdownTerminal=1. The terminal must not already be running (one instance per install).
+- The tester REMEMBERS last-used EA inputs (MQL5\Profiles\Tester\<EA>.set and
+  <EA>.<symbol>.*.ini) and REUSES cached results (Tester\cache\<EA>*.tst). Delete those
+  before every run, or better: compile each parameter variant as its own EA copy with
+  baked-in defaults, then verify the "Inputs:" block in the report header.
+- The /config Deposit value can be ignored - if needed, edit Deposit= in
+  config\terminal.ini [Tester] while the terminal is closed, and always verify the
+  "Initial Deposit" shown in the report.
+- Bar-data simulations OVERSTATE tight trailing stops badly (we measured +67% M5 vs M1,
+  and much worse vs real ticks). Never trust a trail tighter than ~2x spread without a
+  real-tick run.
+- Tick downloads stall on flaky connections: watchdog the Tester\logs file and restart
+  the run if it goes silent >10 minutes. Big tick runs need 4-5 GB RAM - if memory is
+  tight, backtest year-by-year and stitch results.
+- MetaEditor CLI compile: metaeditor64.exe /compile:"<path>" /log:"<log>" (log is UTF-16).
+- Reports: right-click report is manual; CLI writes <Report>.htm (UTF-16) next to the
+  terminal data folder - parse the Inputs and results from there.
+
+Work autonomously: run everything yourself, iterate on failures, and only stop to ask me
+for real decisions (like closing my MT5 or spending money).
+
+==================== PORTABLE VERSION (for a DIFFERENT device) ====================
+
+Use the FULL PROMPT above, but REPLACE its "About me" paragraph with this one:
+
+About me: I'm not a coder - you write and run all code yourself and explain results in
+plain language with tables. This machine's setup is unknown to you, so start by
+discovering it yourself:
+- Find Python (or install it), create a virtual environment for this project, and pip
+  install what you need (pandas, matplotlib, yfinance, MetaTrader5).
+- Check whether MetaTrader 5 is installed (look for terminal64.exe under Program Files
+  and any broker-named folders). If it's missing and the instrument needs MT5, tell me
+  what to download and install - and I'll log into my own demo account myself; don't
+  create accounts for me.
+- Create a fresh project folder for this work and keep everything (code, EA source,
+  reports, README) inside it.
+- Expect tick-history downloads to start from zero on this machine (several GB, needs
+  4-5 GB free RAM for long real-tick runs - if this machine is weak, backtest
+  year-by-year and stitch the results).
+- Nothing from my other machine is available here unless I copied it over. If I have,
+  I'll tell you the folder path.
+
+(Optional but useful: copy the whole "Quant Trading" folder from my main PC to this
+device first - it contains the previous projects, EA sources and this prompt file -
+and mention its location in your first message.)
+
+==================== SHORT VERSION (for sessions in this project folder) ====================
+
+Build and validate an automated strategy for [INSTRUMENT] exactly the way we did the gold
+and Nasdaq bots: sectioned backtests (2020-2022, 2023-2024, 2025-now, full history), $10k
+fresh per section, real ticks for MT5 instruments / Python+Yahoo for ETFs, honest variant
+testing, ATR scaling + 2% auto-risk + recovery mode + restart safety + info panel, ship
+the compiled EA with archived reports and a README. Watch out for all the MT5 tester
+gotchas we already hit (remembered inputs, cached results, deposit override, tick-download
+stalls, bar-sim optimism).

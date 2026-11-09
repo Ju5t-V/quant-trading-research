@@ -1,0 +1,13 @@
+start name_1A_window_A
+start name_2A_window_A
+start name_3A_window_A
+done  name_2A_window_A  exit=0  1040s
+done  name_3A_window_A  exit=0  1040s
+start name_1A_window_B
+start name_2A_window_B
+done  name_1A_window_A  exit=0  1045s
+start name_3A_window_B
+done  name_2A_window_B  exit=0  420s
+done  name_1A_window_B  exit=0  425s
+done  name_3A_window_B  exit=0  420s
+all done in 1476s

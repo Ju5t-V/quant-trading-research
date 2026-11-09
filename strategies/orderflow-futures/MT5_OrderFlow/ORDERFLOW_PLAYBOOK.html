@@ -1,0 +1,811 @@
+<title>Gold Orderflow Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F2F5F3; --surface:#FFFFFF; --sunk:#E7ECE9;
+  --ink:#16201D; --muted:#56635E; --rule:#D3DAD6;
+  --brass:#946A0C; --brass-soft:#F3E7C6;
+  --ok:#1D7550; --ok-soft:#DDEFE5;
+  --part:#9A6A12; --part-soft:#F5EAD3;
+  --no:#A83434; --no-soft:#F6E0DE;
+  --untested:#4F6286; --untested-soft:#E2E7F1;
+  --asia:#6082E6; --london:#3FA872; --ny:#E0714F;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1412; --surface:#161D1A; --sunk:#1D2622;
+    --ink:#E4EBE7; --muted:#9AA8A2; --rule:#2B3531;
+    --brass:#D8A83C; --brass-soft:#33290F;
+    --ok:#5CC495; --ok-soft:#15302A;
+    --part:#E0AE52; --part-soft:#33290F;
+    --no:#EE8176; --no-soft:#3A1E1C;
+    --untested:#9FB3DA; --untested-soft:#1F2638;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1412; --surface:#161D1A; --sunk:#1D2622;
+  --ink:#E4EBE7; --muted:#9AA8A2; --rule:#2B3531;
+  --brass:#D8A83C; --brass-soft:#33290F;
+  --ok:#5CC495; --ok-soft:#15302A;
+  --part:#E0AE52; --part-soft:#33290F;
+  --no:#EE8176; --no-soft:#3A1E1C;
+  --untested:#9FB3DA; --untested-soft:#1F2638;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 16px/1.62 var(--body);padding-inline:20px;padding-block:0 64px}
+a{color:var(--brass);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:2px}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--sunk);padding:1px 5px;border-radius:3px;white-space:nowrap}
+
+.masthead{max-width:1180px;margin:0 auto;padding-block:40px 28px;border-bottom:1px solid var(--rule);display:grid;gap:14px}
+.eyebrow{font:600 13px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+h1{font:700 clamp(40px,6vw,64px)/.95 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{max-width:66ch;color:var(--muted);font-size:17px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font:500 13px/1.4 var(--mono);color:var(--muted)}
+
+.shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;padding-top:32px}
+nav.index{position:sticky;top:20px;align-self:start;font-size:14px}
+nav.index p{font:600 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+nav.index ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:ix}
+nav.index a{display:block;padding:5px 10px;border-left:2px solid var(--rule);color:var(--ink);text-decoration:none}
+nav.index a:hover{border-left-color:var(--brass);color:var(--brass)}
+main{min-width:0;max-width:780px}
+section{padding-block:8px 36px;border-bottom:1px solid var(--rule);margin-bottom:28px;scroll-margin-top:16px}
+section:last-child{border-bottom:0}
+h2{font:700 34px/1.05 var(--display);margin:0 0 6px;text-wrap:balance}
+h3{font:600 22px/1.15 var(--display);margin:28px 0 8px;letter-spacing:.01em;text-wrap:balance}
+.kicker{font:600 13px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{padding-left:22px;margin:0 0 14px;max-width:68ch}
+li{margin-bottom:6px}
+strong{font-weight:600}
+
+.callout{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:16px 18px;margin:18px 0;display:grid;gap:6px}
+.callout.warn{border-color:var(--part);background:var(--part-soft)}
+.callout.stop{border-color:var(--no);background:var(--no-soft)}
+.callout .t{font:600 15px/1.2 var(--display);letter-spacing:.08em;text-transform:uppercase}
+.callout p{margin:0}
+
+.grade{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;white-space:nowrap}
+.grade::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.g-ok{color:var(--ok);background:var(--ok-soft)}
+.g-part{color:var(--part);background:var(--part-soft)}
+.g-no{color:var(--no);background:var(--no-soft)}
+.g-un{color:var(--untested);background:var(--untested-soft)}
+
+.scroll{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:600 13px/1.2 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0}
+.tool{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.tool h4{margin:0;font:600 19px/1.1 var(--display)}
+.tool p{margin:0;font-size:14.5px;color:var(--muted)}
+
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:18px 0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--surface)}
+.rung{padding:14px 16px;display:grid;gap:6px;align-content:start;border-right:1px solid var(--rule)}
+.rung:last-child{border-right:0}
+.rung .tf{font:700 30px/1 var(--display);color:var(--brass)}
+.rung .role{font:600 13px/1 var(--display);letter-spacing:.12em;text-transform:uppercase}
+.rung p{margin:0;font-size:14px;color:var(--muted)}
+
+.clock{margin:18px 0 8px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:16px}
+.clock .hours{display:grid;grid-template-columns:repeat(24,1fr);font:500 11px/1 var(--mono);color:var(--muted);margin-bottom:6px}
+.clock .hours span{text-align:left}
+.lane{display:grid;grid-template-columns:repeat(24,1fr);height:26px;margin-bottom:6px;position:relative;background:var(--sunk);border-radius:3px}
+.lane .blk{border-radius:3px;font:600 12px/26px var(--display);letter-spacing:.08em;text-transform:uppercase;color:#fff;padding-left:8px;white-space:nowrap;overflow:hidden}
+.lane.markers{background:transparent;height:auto;min-height:26px}
+.mark{font:500 11.5px/1.3 var(--mono);color:var(--ink);border-left:2px solid var(--brass);padding-left:6px}
+.clock .note{font-size:13px;color:var(--muted);margin:10px 0 0}
+
+.steps{list-style:none;padding:0;margin:16px 0;display:grid;gap:10px;max-width:none;counter-reset:st}
+.steps li{counter-increment:st;display:grid;grid-template-columns:44px 1fr;gap:12px;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;margin:0}
+.steps li::before{content:counter(st);font:700 28px/1 var(--display);color:var(--brass)}
+.steps b{display:block;font:600 17px/1.2 var(--display);letter-spacing:.02em;margin-bottom:3px}
+
+.setup{background:var(--surface);border:1px solid var(--rule);border-radius:8px;margin:22px 0;overflow:hidden}
+.setup header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--sunk)}
+.setup header h3{margin:0;font-size:24px}
+.setup dl{margin:0;display:grid;grid-template-columns:130px 1fr}
+.setup dt,.setup dd{margin:0;padding:10px 18px;border-bottom:1px solid var(--rule)}
+.setup dt{font:600 13px/1.4 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.setup dd{font-size:15px}
+.setup dl > :nth-last-child(-n+2){border-bottom:0}
+
+.status-row{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:4px 18px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.status-row:last-child{border-bottom:0}
+.status-row .msg{font:500 13px/1.45 var(--mono);color:var(--no)}
+.status-row .msg.info{color:var(--part)}
+.status-row p{margin:0;font-size:15px}
+
+.checklist{list-style:none;padding:0;display:grid;gap:8px}
+.checklist li{display:grid;grid-template-columns:22px 1fr;gap:10px;margin:0}
+.checklist li::before{content:"";width:16px;height:16px;border:2px solid var(--brass);border-radius:3px;margin-top:4px}
+
+footer{max-width:1180px;margin:24px auto 0;color:var(--muted);font-size:13px}
+
+.anatomy{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:20px;align-items:center;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:16px;margin:16px 0}
+.anatomy svg{width:100%;max-width:260px;height:auto;display:block}
+.anatomy dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14.5px}
+.anatomy dt{font:600 13px/1.5 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.anatomy dd{margin:0}
+.patterns{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:16px 0}
+.pattern{background:var(--surface);border:1px solid var(--rule);border-radius:8px;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto}
+.pattern figure{margin:0;background:var(--sunk);border-bottom:1px solid var(--rule);padding:10px}
+.pattern figure svg{width:100%;height:auto;max-height:150px;display:block}
+.pattern h4{margin:12px 16px 0;font:600 20px/1.1 var(--display)}
+.pattern .body{padding:6px 16px 12px;font-size:14.5px;display:grid;gap:8px;align-content:start}
+.pattern .body p{margin:0}
+.pattern .res{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--rule)}
+.pattern .res div{padding:10px 16px;display:grid;gap:2px}
+.pattern .res div + div{border-left:1px solid var(--rule)}
+.pattern .res span{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pattern .res b{font:500 15px/1.3 var(--mono);color:var(--no);font-variant-numeric:tabular-nums}
+svg .up{fill:var(--ok)} svg .dn{fill:var(--no)} svg .wick{stroke:var(--ink);stroke-width:1.5}
+svg .guide{stroke:var(--brass);stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+svg .lbl{fill:var(--muted);font:500 10px var(--mono)}
+svg .lbl-b{fill:var(--brass);font:600 10px var(--mono)}
+svg .ghost{fill:var(--rule)}
+@media (max-width:560px){.anatomy{grid-template-columns:1fr}}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:12px}
+  nav.index{position:static;border-bottom:1px solid var(--rule);padding-bottom:14px}
+  nav.index ol{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+}
+@media (max-width:560px){
+  .ladder{grid-template-columns:1fr}
+  .rung{border-right:0;border-bottom:1px solid var(--rule)}
+  .rung:last-child{border-bottom:0}
+  .setup dl{grid-template-columns:1fr}
+  .setup dt{border-bottom:0;padding-bottom:0}
+  .status-row{grid-template-columns:1fr}
+  .clock .hours span:nth-child(odd){visibility:hidden}
+  h2{font-size:29px}
+}
+</style>
+
+<header class="masthead">
+  <div class="eyebrow">XAUUSD · H1 context · M5 execution · M1 trigger</div>
+  <h1>Gold Orderflow Playbook</h1>
+  <p class="lede">How to read the five OrderFlow indicators together, find a level worth trading, time the entry and place the stop and target — with every rule graded by what was actually measured on gold, not by what trading forums claim.</p>
+  <div class="meta"><span>Indicators v1.10 · 13 Sep 2026</span><span>MetaQuotes-Demo feed</span><span>Sim only until the gate in §13 is passed</span></div>
+</header>
+
+<div class="shell">
+<nav class="index" aria-label="Sections">
+  <p>Contents</p>
+  <ol>
+    <li><a href="#honest">1 · Read this first</a></li>
+    <li><a href="#toolkit">2 · The toolkit</a></li>
+    <li><a href="#charts">3 · Chart setup</a></li>
+    <li><a href="#clock">4 · The trading day</a></li>
+    <li><a href="#routine">5 · Pre-session routine</a></li>
+    <li><a href="#reading">6 · Reading each layer</a></li>
+    <li><a href="#flow">7 · From context to entry</a></li>
+    <li><a href="#setups">8 · The setups</a></li>
+    <li><a href="#stops">9 · Stops and targets</a></li>
+    <li><a href="#status">10 · Status-line warnings</a></li>
+    <li><a href="#orders">11 · Sizing and orders</a></li>
+    <li><a href="#journal">12 · Journal and CSV</a></li>
+    <li><a href="#gate">13 · Risk rules and the gate</a></li>
+    <li><a href="#evidence">14 · Evidence summary</a></li>
+    <li><a href="#candles">15 · Candlestick entries</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<section id="honest">
+  <p class="kicker">Section 1</p>
+  <h2>Read this first</h2>
+  <p>Every rule in this playbook carries a grade. The grades come from tests run on this feed — XAUUSD M5 from 6 Aug 2019 to 11 Sep 2026 (1,834 session profiles, so 1,833 next-session pairs) for the level rules, and the most recent 2,000 M5 bars (about 8 trading days) for absorption — not from books or videos.</p>
+  <p><strong>Everything except the candlestick test is in-sample.</strong> No period was held back for the level and absorption rules, and none of them has been repeated on data it was not found on. The candlestick test (§15) set its rules first and kept 2024–2026 back as an unseen check. Every test and its exit rule is listed in §14.</p>
+  <p>
+    <span class="grade g-ok">Supported</span>
+    <span class="grade g-part">Partly</span>
+    <span class="grade g-no">Not supported</span>
+    <span class="grade g-un">Untested</span>
+  </p>
+  <div class="callout warn">
+    <div class="t">The honest summary</div>
+    <p>No rule in this toolkit has survived a proper control. The one partly supported result — the value-area fill — is a small in-sample excess over a base rate, measured without a stop. The volume-shelf "lingering" effect that earlier versions of this guide leaned on disappeared once distance from the open was controlled (§9). Treat everything here as a structured way to <strong>take and record sim trades</strong>, not as a proven method.</p>
+  </div>
+  <p>Two facts about this feed shape everything below:</p>
+  <ul>
+    <li><strong>XAUUSD here is a CFD.</strong> There is no real traded volume and no buy/sell flag on trades. "Volume" is a tick count, and buy-versus-sell pressure (delta) is estimated. Measured: that estimate explains only <strong>1.7%</strong> of a bar's price move. Treat anything built on delta as a weak hint.</li>
+    <li><strong>On this feed a volume profile is close to a time profile.</strong> Volume is a tick count, so a "high-volume" price is mostly a price where the market spent time. Yesterday's shelves do get revisited more than yesterday's gaps — but by exactly as much as any level at the same distance from today's open. Measured: no volume effect (−0.2 bars, §9).</li>
+  </ul>
+</section>
+
+<section id="toolkit">
+  <p class="kicker">Section 2</p>
+  <h2>The toolkit</h2>
+  <p>Five pieces, each answering one question. Keep that question in mind — most mistakes come from asking an indicator something it cannot answer.</p>
+  <div class="tools">
+    <div class="tool">
+      <h4>OF_Heatmap</h4>
+      <p><strong>Where did trade actually happen?</strong> Heatmap cells, the volume profile on the right, POC (red), value area (blue dashes), HVN bands (gold, labelled) and LVN lines (grey dots), plus the widest empty gap.</p>
+      <span class="grade g-no">HVN/LVN effect gone under control</span>
+    </div>
+    <div class="tool">
+      <h4>OF_Sessions</h4>
+      <p><strong>Which session is this, and what range has it made?</strong> See-through Asia / London / New York boxes with each session's high and low.</p>
+      <span class="grade g-un">Context tool</span>
+    </div>
+    <div class="tool">
+      <h4>OF_SMC</h4>
+      <p><strong>What is the price structure?</strong> Swing and internal BOS/CHoCH, order blocks, fair value gaps, equal highs/lows, premium/discount zones.</p>
+      <span class="grade g-un">Untested — pattern, not orderflow</span>
+    </div>
+    <div class="tool">
+      <h4>OF_Absorption</h4>
+      <p><strong>Was there unusual volume that failed to move price?</strong> Bubbles sized by volume, a line at the defended price, gold boxes for stacked zones.</p>
+      <span class="grade g-no">Not supported as a trigger</span>
+    </div>
+    <div class="tool">
+      <h4>OF_Probe (script)</h4>
+      <p><strong>What does this feed actually carry?</strong> Run it once per new broker or symbol. It tells you whether volume and aggressor side are real or inferred.</p>
+      <span class="grade g-ok">Measurement tool</span>
+    </div>
+  </div>
+</section>
+
+<section id="charts">
+  <p class="kicker">Section 3</p>
+  <h2>Chart setup</h2>
+  <p>Three XAUUSD charts, one per job. Each timeframe answers a different question, and you move down the ladder only when the one above says yes.</p>
+  <div class="ladder">
+    <div class="rung"><div class="tf">H1</div><div class="role">Context</div><p>Is gold trending or rotating? Where are the big shelves and the premium/discount of the swing?</p></div>
+    <div class="rung"><div class="tf">M5</div><div class="role">Execution</div><p>Is price inside, above or below today's value? Which level is in play right now?</p></div>
+    <div class="rung"><div class="tf">M1</div><div class="role">Trigger</div><p>Has price actually rejected the level? Time the entry and keep the stop tight.</p></div>
+  </div>
+
+  <h3>What goes on each chart</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Chart</th><th>Indicator</th><th>Settings that matter</th></tr></thead>
+    <tbody>
+      <tr><td class="num">H1</td><td>OF_Heatmap</td><td>Leave <code>InpAutoTune</code> on — it picks Rolling scope with bar data so the terminal does not freeze.</td></tr>
+      <tr><td class="num">H1</td><td>OF_SMC</td><td>Swing structure on, internal structure off (less clutter). <code>InpShowZones</code> on for premium/discount. Daily and weekly highs/lows on.</td></tr>
+      <tr><td class="num">M5</td><td>OF_Heatmap</td><td>Auto-tune on (Session scope, ticks). <code>InpProfileFullScope</code> on, so levels do not move when you zoom.</td></tr>
+      <tr><td class="num">M5</td><td>OF_Sessions</td><td><code>InpServerGMT</code> = 3 in summer. <strong>Check it after 25 Oct</strong> — see §4.</td></tr>
+      <tr><td class="num">M5</td><td>OF_SMC</td><td>Internal order blocks on, fair value gaps on. These mark <em>areas of interest</em>, not entries.</td></tr>
+      <tr><td class="num">M5</td><td>OF_Absorption</td><td><code>InpMethod</code> = Z-score + impact. <code>InpRequireHVN</code> on, <code>InpHvnSource</code> = H1 or M5 (see below). <code>InpLogCSV</code> on.</td></tr>
+      <tr><td class="num">M1</td><td>OF_SMC</td><td>Internal structure on — the M1 CHoCH is the trigger in §8.</td></tr>
+      <tr><td class="num">M1</td><td>OF_Heatmap</td><td>Optional. Session scope on M1 reads up to 1,440 bars of ticks — watch the Experts log for the build time.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Which HVN set should absorption use?</h3>
+  <p>Each heatmap now publishes its own levels per timeframe, so running it on H1, M5 and M1 at once is safe. On the M5 absorption indicator, <code>InpHvnSource</code> chooses which set filters the bubbles:</p>
+  <ul>
+    <li><strong>M5 (the default)</strong> — today's session shelves. Busier, more signals.</li>
+    <li><strong>H1</strong> — the multi-day shelves. Fewer signals, at levels more traders can see. Needs the H1 heatmap chart to stay open.</li>
+    <li>Never a <em>lower</em> timeframe than the chart. The indicator warns you if you try.</li>
+  </ul>
+  <div class="callout stop">
+    <div class="t">Do not raise InpLookbackBars</div>
+    <p>OF_Absorption re-reads the ticks of every lookback bar on each new bar. At the default 400 bars on M5 the terminal already logged "indicator is too slow, 5,734 ms". A few thousand bars would stall MT5 for tens of seconds every bar.</p>
+  </div>
+</section>
+
+<section id="clock">
+  <p class="kicker">Section 4</p>
+  <h2>The trading day, in Malaysia time</h2>
+  <p>Volume on gold is not spread evenly. The same "heavy" bar means something very different at 10 AM (Asia) and at 9:30 PM (New York cash open). The session boxes use these hours; the times below are Malaysia time (UTC+8) while the broker server is UTC+3.</p>
+  <div class="clock" role="img" aria-label="24-hour clock in Malaysia time: Asia 08:00 to 17:00, London 15:00 to 00:00, New York 20:00 to 05:00, server midnight at 05:00">
+    <div class="hours"><span>00</span><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span></div>
+    <div class="lane"><div class="blk" style="grid-column:9 / 18;background:var(--asia)">Asia 08–17</div></div>
+    <div class="lane"><div class="blk" style="grid-column:16 / 25;background:var(--london)">London 15–24</div></div>
+    <div class="lane"><div class="blk" style="grid-column:1 / 6;background:var(--ny)">NY →05</div><div class="blk" style="grid-column:21 / 25;background:var(--ny)">New York 20–</div></div>
+    <div class="lane markers">
+      <div class="mark" style="grid-column:6 / 11">05:00 server midnight — session profile resets</div>
+      <div class="mark" style="grid-column:22 / 25">21:30 US cash open</div>
+    </div>
+    <p class="note">London–New York overlap (20:00–24:00) is where most of the day's volume trades. Your working window is roughly 21:15 to 04:00.</p>
+  </div>
+  <div class="callout warn">
+    <div class="t">Clock changes this autumn</div>
+    <p><strong>EU clocks change on 25 Oct 2026, US clocks on 1 Nov 2026.</strong> If the broker server moves from UTC+3 to UTC+2, set <code>InpServerGMT</code> = 2 on OF_Sessions and OF_Absorption, the profile reset moves to 06:00, and the US cash open moves to 22:30. Re-check the server time in Market Watch on 26 Oct rather than assuming. For about a month the absorption baseline mixes both clock regimes — the CSV flags those rows in <code>baseline_spans_dst</code>.</p>
+  </div>
+</section>
+
+<section id="routine">
+  <p class="kicker">Section 5</p>
+  <h2>Pre-session routine</h2>
+  <p>About fifteen minutes, done at 21:15 before the New York open. The order matters: each step narrows the next.</p>
+  <ol class="steps">
+    <li><div><b>Check the status lines</b>Top-left of each chart. Any red line (HVN STALE, PROFILE WARMING, CSV error) means that chart is not telling you the truth yet. Fix it or ignore that tool tonight — §10 explains each one.</div></li>
+    <li><div><b>Read H1: trend or rotation?</b>SMC swing structure: a recent BOS in one direction = trend; alternating CHoCHs = rotation. Note whether price sits in the premium (top 5%), discount (bottom 5%) or the middle of the swing.</div></li>
+    <li><div><b>Write down the H1 shelves</b>The labelled HVN prices on the H1 heatmap, plus the previous day's high and low. They are reference prices for tonight — candidate targets, not tested ones (see §9).</div></li>
+    <li><div><b>Locate price against M5 value</b>Inside the value area = expect rotation, fades are allowed. Above VAH = buyers in control, no shorts into strength. Below VAL = sellers in control, no longs into weakness.</div></li>
+    <li><div><b>Mark where the Asian and London ranges ended</b>From the session boxes. The Asian high/low is the classic place London and New York run stops.</div></li>
+    <li><div><b>Write your maximum loss for the night</b>On paper, in dollars, before the first trade. Three losers ends the session regardless.</div></li>
+  </ol>
+</section>
+
+<section id="reading">
+  <p class="kicker">Section 6</p>
+  <h2>Reading each layer</h2>
+
+  <h3>Heatmap cells</h3>
+  <p>Every coloured rectangle behind the candles is <strong>one bar wide and one price row tall</strong>. The row height is the bucket size — 10 points, or $0.10, on gold with the recommended settings. The colour says one thing only: <strong>how much volume traded in that price row during that bar</strong>, measured against the busiest rows on the chart.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Cell colour</th><th>Relative volume</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono" style="background:#5a0014;color:#e6e6e6;padding:2px 7px;border-radius:3px">dark red, faint</span></td><td>just above zero</td><td>Price traded here, but barely. Thin.</td></tr>
+      <tr><td><span class="mono" style="background:#ff0000;color:#fff;padding:2px 7px;border-radius:3px">bright red</span></td><td>up to 40%</td><td>Light trade.</td></tr>
+      <tr><td><span class="mono" style="background:#ffa500;color:#111;padding:2px 7px;border-radius:3px">orange</span></td><td>40–75%</td><td>Busy.</td></tr>
+      <tr><td><span class="mono" style="background:linear-gradient(90deg,#ffd200,#ffffff);color:#111;padding:2px 7px;border-radius:3px">yellow → white</span></td><td>75–100%</td><td>The heaviest trade on the chart. This is a shelf.</td></tr>
+      <tr><td>no colour — chart background</td><td>none</td><td>No trade at that price in that bar at all.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout warn">
+    <div class="t">Red is the quiet end, and no colour means selling</div>
+    <p>The default <em>Fire</em> scheme runs <strong>dark red → red → orange → yellow → white</strong> as volume <em>rises</em>. So a red cell behind a candle is near the <strong>thin</strong> end of the scale, not the busy one — the levels that matter are the orange and white shelves. Cells also fade as they thin out, so quiet rows are both dark and see-through.</p>
+    <p>Nothing in the colour carries direction. There is no buy/sell, bullish/bearish or delta meaning in a red or a white cell: this is traded volume at a price, full stop. Aggressor side on a gold CFD feed is inferred rather than real — run <code>OF_Probe</code> once to see what your feed actually carries. If red keeps reading as "sell" to your eye, switch <code>InpScheme</code> to Ice (blue) or Mono (grey).</p>
+  </div>
+  <p>Two settings shape the picture. <strong>Log scale</strong> (on by default) lifts the quiet rows so they are visible at all — but it also means the colour bands are spaced by orders of magnitude, so a mid-orange cell holds a small fraction of the busiest cell's volume, not half of it. <strong>Saturate at 99%</strong> makes the busiest 1% of cells all render at full heat, so one freak bar cannot flatten the rest of the chart to black.</p>
+  <p>Reading it: a long candle with one bright shelf and a lot of dark space is not a strong move — price passed through most of that range without trade. The shelf is the level; the empty part of the wick is noise.</p>
+
+  <h3>The stats panel</h3>
+  <p>The dark box in the corner turns the profile into numbers. It sits top-right by default; set <code>InpDashCorner</code> to <em>Bottom left</em> if it covers the histogram.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Row</th><th>What it is</th><th>How to read it</th></tr></thead>
+    <tbody>
+      <tr><td>POC</td><td>The most-traded price in the scope.</td><td>Reference and realistic first target — not a magnet (see below).</td></tr>
+      <tr><td>Dist to POC</td><td>How far price is from the POC, in percent.</td><td>Near zero = sitting in value. Large = stretched away from it.</td></tr>
+      <tr><td>VA range</td><td>Value-area low to high: the band holding 70% of the volume.</td><td>Inside = rotation likely. Outside = one side in control.</td></tr>
+      <tr><td>Upper mass / Lower mass</td><td>Share of volume above and below the midpoint of the profiled range.</td><td>Where trade actually sits, regardless of where price is now.</td></tr>
+      <tr><td>Mass skew</td><td>Upper ÷ lower. 1.00× is balanced.</td><td>Well above 1 = the shelves are overhead; well below 1 = underneath.</td></tr>
+      <tr><td>Range loc</td><td>Where price sits in the profiled range: 0% = the low, 100% = the high.</td><td>A quick check that you are not buying the top of the day.</td></tr>
+      <tr><td>Total vol</td><td>Volume in the scope. A <code>(ticks)</code> suffix means tick counts, not contracts.</td><td>Thin totals = treat every level on the chart lightly.</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Is the volume real?</strong> The first status line at the top-left answers it: <span class="mono" style="color:#32cd32">green</span> means real exchange volume, <span class="mono" style="color:#ffa500">orange</span> means tick counts — the number of price updates, which is a decent proxy for activity but not contracts traded. The same line says whether the cells were built from <strong>tick data</strong> or fell back to <strong>BAR data</strong>, which is much coarser.</p>
+
+  <h3>HVN bands and LVN lines <span class="grade g-no">No effect under control</span></h3>
+  <p>The thin gold bands with an "HVN price" tag, and the grey dotted LVN lines between them. They show where yesterday's and today's trade concentrated. The tested claim was that price lingers at shelves and crosses gaps fast. The raw numbers looked like it (25 vs 15 bars), but the same gap appears for levels with no volume meaning at the same distance from the open (21 vs 12). The volume shelf itself added nothing.</p>
+  <p>What that leaves: shelves are a readable picture of where the market spent time, useful for orientation and for naming a level. Any rule of the form "targets at HVNs, stops beyond LVNs" is <strong>untested craft</strong>, not evidence.</p>
+
+  <h3>POC and value area <span class="grade g-part">Partly</span></h3>
+  <p>The POC (red) is the single most-traded price, and the value area (blue dashes) holds 70% of the session's volume. The POC is a sensible reference and realistic target, but <strong>it is not a magnet</strong>: the next session trades through the prior POC 66.7% of the time, against 66.2% for a mirrored level the same distance from the open. The value-area fill below is the one place value has a measured edge.</p>
+
+  <h3>SMC structure <span class="grade g-un">Untested</span></h3>
+  <ul>
+    <li><strong>BOS</strong> — a close through the last swing in the trend's direction: trend continues.</li>
+    <li><strong>CHoCH</strong> — the first close through a swing <em>against</em> the trend: the warning shot. On M1 this is the cleanest objective trigger in this toolkit.</li>
+    <li><strong>Order blocks and FVGs</strong> — see-through boxes. Treat them as areas of interest. They matter most where they <em>overlap a volume shelf</em>; an order block sitting in an empty LVN had little trade behind it.</li>
+    <li><strong>Premium / discount</strong> — the top and bottom 5% of the active swing. Longs from discount and shorts from premium have more room to run.</li>
+  </ul>
+
+  <h3>Absorption bubbles <span class="grade g-no">Not supported as a trigger</span></h3>
+  <p>Unusual volume, little movement, close rejecting one end. Every tested threshold gave a <strong>negative average</strong>, and results got worse as criteria tightened — the signature of noise. Use a bubble only as a <strong>tiebreaker</strong>: if you already have a level and a rejection, a bubble at that level is mild supporting evidence. A bubble on its own is not a trade.</p>
+
+  <h3>Session boxes</h3>
+  <p>A thin, low-volume Asian range is not real participation. When London or New York trades beyond the Asian high or low and then closes back inside, stops were run. That is context for the sweep setup in §8, which is untested.</p>
+</section>
+
+<section id="flow">
+  <p class="kicker">Section 7</p>
+  <h2>From context to entry</h2>
+  <p>The same sequence for every trade. If a step fails, stop there — do not skip ahead because the chart "looks good".</p>
+  <ol class="steps">
+    <li><div><b>Context agrees (H1)</b>Your trade direction fits the H1 picture: with the trend, or a fade inside a rotation. A long from the H1 premium zone in a downtrend fails this step.</div></li>
+    <li><div><b>A named level (M5)</b>You can say the exact price and what it is: an H1 HVN band edge, the prior value-area high or low, the Asian high or low, or an order block that overlaps a volume shelf. "Somewhere around here" is not a level.</div></li>
+    <li><div><b>Price comes to you</b>Set an MT5 price alert a few dollars before the level and wait. Entering early because you expect the level to hold is the most common way to take a full-size loss.</div></li>
+    <li><div><b>Rejection on M1</b>At the level, an M1 bar closes back on your side of it, and the M1 internal structure prints a CHoCH in your direction. An absorption bubble at the level strengthens it; its absence does not cancel it.</div></li>
+    <li><div><b>Risk check before the click</b>Stop beyond the rejection extreme. Target at the next named level (placement by HVN/LVN is untested — §9). Reward at least 2× risk. Lot size calculated (§11). If the target is closer than 2R, there is no trade.</div></li>
+    <li><div><b>Manage by the map</b>Take part of the position at the POC or the first HVN on the way. Do not move the stop to breakeven until that first target fills. Flat by 04:00 whatever happens.</div></li>
+  </ol>
+
+  <div class="callout warn">
+    <div class="t">This sequence is not Setup A's method</div>
+    <p>Step 4's M1 CHoCH trigger is <strong>untested</strong>. Setup A — the only partly supported setup — does not use it: its measured trigger is six consecutive M5 closes inside the prior value area, with no M1 step. The sequence above describes setups B, C and D; take Setup A exactly as its card is written.</p>
+  </div>
+
+  <h3>No-trade conditions</h3>
+  <ul class="checklist">
+    <li>Any red status line on the chart you are trading from.</li>
+    <li>Price is sitting in the middle of an HVN band — it will chop.</li>
+    <li>Within 15 minutes of a scheduled US release (CPI, NFP, FOMC). Spread widens and levels stop meaning much.</li>
+    <li>The first 30 minutes after the 05:00 profile reset (PROFILE WARMING) — the session profile is built on almost nothing.</li>
+    <li>Three losing trades already tonight.</li>
+  </ul>
+</section>
+
+<section id="setups">
+  <p class="kicker">Section 8</p>
+  <h2>The setups</h2>
+  <p>Four patterns, each written the same way so you can compare them. Only the first has a measured edge; the rest are there to be proven or dropped in sim.</p>
+
+  <article class="setup">
+    <header><h3>A · Value-area fill</h3><span class="grade g-part">Partly · +8.4 percentage points over base rate</span></header>
+    <dl>
+      <dt>Market</dt><dd>The session opens outside the prior day's value area.</dd>
+      <dt>Where</dt><dd>The value-area edge price re-enters through.</dd>
+      <dt>Trigger</dt><dd>Price re-enters value and holds: six consecutive M5 closes between VAL and VAH (30 minutes).</dd>
+      <dt>Entry</dt><dd>Market, on the close of the sixth bar inside.</dd>
+      <dt>Stop</dt><dd><em>Not part of the test.</em> A reasonable starting point: back outside the edge you came through. Whatever you choose changes the hit rate below.</dd>
+      <dt>Target</dt><dd>The opposite value-area edge — the only target that was measured.</dd>
+      <dt>Invalid if</dt><dd>An M5 bar closes back outside the edge you entered through. <em>Not part of the test either.</em></dd>
+      <dt>Evidence</dt><dd>Measured as a yes/no event with <strong>no stop and no time exit</strong>: after the sixth inside close, did price touch the opposite value-area edge at any point before the server day ended? It did in <strong>239 of 545</strong> setups (<strong>43.9%</strong>), on 545 of 1,833 session pairs. The comparison is <strong>35.4%</strong> of all sessions covering the whole prior value area — an unconditional rate, not a matched control. This is a touch rate, <strong>not a win rate</strong>: it does not tell you how often a trade with any particular stop wins, and no per-trade R or expectancy exists for it. In-sample only.</dd>
+    </dl>
+  </article>
+
+  <article class="setup">
+    <header><h3>B · LVN traverse</h3><span class="grade g-un">Untested · premise failed its control</span></header>
+    <dl>
+      <dt>Market</dt><dd>Price is leaving an HVN band towards an LVN, in the direction H1 agrees with.</dd>
+      <dt>Where</dt><dd>The edge of the HVN band facing the gap.</dd>
+      <dt>Trigger</dt><dd>An M5 bar closes clear of the band edge, moving into the LVN. On M1, the first pullback that fails to re-enter the band.</dd>
+      <dt>Entry</dt><dd>Market on the M1 failed pullback (or the M5 close if you cannot watch M1).</dd>
+      <dt>Stop</dt><dd>Back inside the band it just left. If price returns to the shelf, the move has failed.</dd>
+      <dt>Target</dt><dd>The near edge of the next HVN band beyond the gap. Never inside the gap.</dd>
+      <dt>Invalid if</dt><dd>An M5 bar closes back inside the band.</dd>
+      <dt>Evidence</dt><dd>The idea rests on price crossing LVNs faster than it leaves HVNs. Once distance from the open was controlled, that difference disappeared (§9). The entry has never been tested. Keep it only if your own sim log shows something.</dd>
+    </dl>
+  </article>
+
+  <article class="setup">
+    <header><h3>C · Shelf rejection with confluence</h3><span class="grade g-no">Not supported mechanically · sim only</span></header>
+    <dl>
+      <dt>Market</dt><dd>H1 is rotating, or price is at the edge of the H1 swing (premium for shorts, discount for longs).</dd>
+      <dt>Where</dt><dd>An H1 HVN band or prior value edge that <em>overlaps</em> an SMC order block or fair value gap. The overlap is the point: structure with trade behind it.</dd>
+      <dt>Trigger</dt><dd>On M1: price pushes into the zone, a bar closes back out, and internal structure prints a CHoCH away from the level. An absorption bubble at the level is a tiebreaker.</dd>
+      <dt>Entry</dt><dd>Market on the CHoCH close, or a limit back at the level after it.</dd>
+      <dt>Stop</dt><dd>Beyond the rejection extreme and past the nearest LVN — not inside the shelf.</dd>
+      <dt>Target</dt><dd>The POC, then the far value edge or the next H1 HVN.</dd>
+      <dt>Invalid if</dt><dd>An M5 close through the far side of the zone.</dd>
+      <dt>Evidence</dt><dd>Tested as: enter at the level on the first touch of the prior day's VAH or VAL, exit at the close 12 M5 bars (1 hour) later, no stop, no target. Fading VAH averaged −57 points (−$0.57 per ounce) gross. Fading VAL averaged +72 points gross, but 5 of 7 years were flat or negative after a 36-point spread, and 2026 alone carried it. Confluence and the M1 trigger are the untested filters that would have to rescue it.</dd>
+    </dl>
+  </article>
+
+  <article class="setup">
+    <header><h3>D · Asian range sweep</h3><span class="grade g-un">Untested</span></header>
+    <dl>
+      <dt>Market</dt><dd>A narrow Asian box, then London or New York trades beyond its high or low.</dd>
+      <dt>Where</dt><dd>The Asian high (for shorts) or low (for longs), drawn by OF_Sessions.</dd>
+      <dt>Trigger</dt><dd>Price breaks the Asian extreme, then an M5 bar closes back inside the Asian range, with an M1 CHoCH back inside.</dd>
+      <dt>Entry</dt><dd>Market on the M1 CHoCH close.</dd>
+      <dt>Stop</dt><dd>Beyond the sweep's extreme.</dd>
+      <dt>Target</dt><dd>The Asian range midpoint, then the opposite Asian extreme or the nearest HVN.</dd>
+      <dt>Invalid if</dt><dd>A second M5 close outside the Asian range.</dd>
+      <dt>Evidence</dt><dd>None measured yet. A widely taught idea — which is exactly why it needs testing before money.</dd>
+    </dl>
+  </article>
+</section>
+
+<section id="stops">
+  <p class="kicker">Section 9</p>
+  <h2>Stops and targets</h2>
+  <div class="callout stop">
+    <div class="t">No tested support for this table</div>
+    <p>Earlier versions called this the toolkit's strongest part, citing the 1.7× lingering result. That result used levels from the <strong>prior</strong> session and counted bars in the <strong>next</strong> one, so it was not circular. But it never controlled for distance from the open. Rerun with each level mirrored across the open: HVN 25 vs mirrored 21 bars, LVN 15 vs mirrored 12, and a paired volume-attributable difference of <strong>−0.2 bars</strong> over 1,828 session pairs. Within distance bins HVN and LVN are the same (e.g. 68 vs 67 bars within $2 of the open). The test also used one HVN (the smoothed profile maximum) and one LVN per day, not the indicator's multi-node levels.</p>
+    <p>The table below is conventional practice, kept as a starting point for your sim log. It is <strong>untested</strong>.</p>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>Place</th><th>As a stop</th><th>As a target</th></tr></thead>
+    <tbody>
+      <tr><td>Inside an HVN band</td><td>Conventionally avoided</td><td>Conventionally used</td></tr>
+      <tr><td>Just beyond an LVN / void</td><td>Conventionally used</td><td>Conventionally avoided</td></tr>
+      <tr><td>POC</td><td>Avoid</td><td>Good first partial — not a magnet, but heavily traded</td></tr>
+      <tr><td>Value-area edge</td><td>Beyond it, plus an LVN buffer</td><td>Good for the fill setup</td></tr>
+      <tr><td>Order block / FVG with no shelf behind it</td><td>Not reliable either way</td><td>Not reliable</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><strong>Mind the spread.</strong> It was 36 points ($0.36) when measured. On a $3 stop that is 12% of your risk before price moves. Stops tighter than about $1.80 (five spreads) are mostly paying the broker.</li>
+    <li><strong>Aim for the near edge of a band,</strong> not its centre. Price starts stalling as it reaches the shelf.</li>
+    <li><strong>Never widen a stop</strong> once the trade is on. If the level is wrong, the trade is wrong.</li>
+  </ul>
+</section>
+
+<section id="status">
+  <p class="kicker">Section 10</p>
+  <h2>Status-line warnings</h2>
+  <p>The dark panels at the top-left of each chart tell you whether an indicator can be trusted right now. Orange and red are not decoration — each one below means something specific.</p>
+  <div class="callout" style="gap:0;padding-block:4px">
+    <div class="status-row"><div class="msg">HVN STALE - SIGNALS BLOCKED</div><p>The heatmap for the chosen HVN timeframe was removed or has not refreshed for over 5 minutes, so absorption is suppressing bubbles. Open that timeframe's heatmap chart again, or change <code>InpHvnSource</code>.</p></div>
+    <div class="status-row"><div class="msg">HVN ABSENT - SIGNALS BLOCKED</div><p>Usually just after the 05:00 reset while the profile warms up, or the heatmap found no nodes. Expected; wait it out. If it persists, check the heatmap is on the right timeframe.</p></div>
+    <div class="status-row"><div class="msg">HVN STALE - FILTER BYPASSED</div><p>Pass mode is on: bubbles are showing without the HVN check. Do not treat them as HVN-confirmed.</p></div>
+    <div class="status-row"><div class="msg">LEGACY v1.00 globals</div><p>An old heatmap version is on the chart. Remove it and add OF_Heatmap again.</p></div>
+    <div class="status-row"><div class="msg info">PROFILE WARMING (12/30)</div><p>Fewer than 30 bars in the session scope. HVNs are not published yet on purpose — a three-bar profile is noise.</p></div>
+    <div class="status-row"><div class="msg info">PROFILE TRUNCATED</div><p>The scope is bigger than 2,000 bars; the profile covers the most recent bars only. Normal on a long Rolling scope.</p></div>
+    <div class="status-row"><div class="msg info">RECENCY OFF - SCOPE TOO LARGE</div><p>You turned on recency weighting, but it would re-read too many bars of ticks and freeze MT5, so it was switched off.</p></div>
+    <div class="status-row"><div class="msg info">rolling fallback on 37/400 bars</div><p>Those bars did not have enough same-time-of-day history, so their volume Z-score uses the older flat window. Session-open bubbles on those bars are less reliable. More history helps: Tools → Options → Charts → Max bars in chart.</p></div>
+    <div class="status-row"><div class="msg info">BAR data (no ticks)</div><p>The heatmap could not get ticks and built the picture from bars. Normal on H1; on M5 it means tick history has not downloaded yet.</p></div>
+    <div class="status-row"><div class="msg">CSV SCHEMA MISMATCH</div><p>The existing CSV file has different columns. Rename or move the old file (File → Open Data Folder → MQL5 → Files); nothing is written until you do.</p></div>
+    <div class="status-row"><div class="msg">CSV WRITE PENDING (2 rows)</div><p>The file is locked, usually open in Excel. Close it; the rows are kept and written on the next bar.</p></div>
+  </div>
+</section>
+
+<section id="orders">
+  <p class="kicker">Section 11</p>
+  <h2>Sizing and placing the order</h2>
+  <p>Contract facts for this XAUUSD, read from the terminal: <strong>100 oz per lot</strong>, so 1.00 lot moves $100 for every $1 in gold and 0.01 lot moves $1. Minimum lot and lot step are both 0.01.</p>
+  <p class="mono" style="background:var(--sunk);padding:12px 14px;border-radius:6px;max-width:none">lots = risk in dollars ÷ (stop distance in dollars × 100)</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Account</th><th>Risk 1%</th><th>Stop</th><th>Lots</th></tr></thead>
+    <tbody>
+      <tr><td class="num">$10,000</td><td class="num">$100</td><td class="num">$3.00</td><td class="num">0.33</td></tr>
+      <tr><td class="num">$10,000</td><td class="num">$100</td><td class="num">$5.00</td><td class="num">0.20</td></tr>
+      <tr><td class="num">$3,000</td><td class="num">$30</td><td class="num">$3.00</td><td class="num">0.10</td></tr>
+    </tbody>
+  </table></div>
+  <ol>
+    <li>Work out the lot size <em>before</em> price reaches the level, not while it is moving.</li>
+    <li>Press <strong>F9</strong> (or right-click the chart → Trading → New Order).</li>
+    <li>Choose <strong>Market Execution</strong> for an M1 trigger you are acting on now, or <strong>Buy Limit / Sell Limit</strong> to rest at a marked level.</li>
+    <li>Enter <strong>Volume</strong>, <strong>Stop Loss</strong> and <strong>Take Profit</strong> in the same ticket. Never send the order planning to add the stop afterwards.</li>
+    <li>After the fill, check entry, stop, target and lot size on the Trade tab.</li>
+  </ol>
+</section>
+
+<section id="journal">
+  <p class="kicker">Section 12</p>
+  <h2>Journal and the absorption CSV</h2>
+  <h3>Your trade journal</h3>
+  <p>One row per sim trade: date and time, setup letter (A–D), the level and what it was, entry, stop, target, exit, result in dollars and in R, and one line on whether you followed this playbook exactly.</p>
+
+  <h3>The CSV the indicator writes</h3>
+  <p>With <code>InpLogCSV</code> on, OF_Absorption appends a row for every bar that passes its detection method while the chart is open — including bars the HVN filter rejected. Find it via File → Open Data Folder → MQL5 → Files → <code>OF_Absorption_XAUUSD_M5.csv</code>.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Column</th><th>What to use it for</th></tr></thead>
+    <tbody>
+      <tr><td><code>hvn_filter_passed</code></td><td>Compare 1 vs 0 rows later: does the HVN filter actually improve outcomes?</td></tr>
+      <tr><td><code>hvn_status</code></td><td>Drop <code>stale</code> and <code>absent</code> rows when judging the filter.</td></tr>
+      <tr><td><code>session</code></td><td>Asia / London / NY / off-hours — does it only work in New York?</td></tr>
+      <tr><td><code>stacked</code></td><td>Do repeated absorptions at one price do better than single ones?</td></tr>
+      <tr><td><code>volume_z</code>, <code>price_impact</code></td><td>Where to set the thresholds once outcomes are known.</td></tr>
+      <tr><td><code>baseline_spans_dst</code></td><td>Exclude these rows — the clock change distorts the baseline.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Tuning to two or three signals a day</h3>
+  <ol>
+    <li>Read the firing rate on status line 1: "x.x/day over N days" and "last 24h".</li>
+    <li>On attach, the Experts tab prints p50 / p90 / p95 / p99 for delta ratio, price impact and range/ATR, and the percentage of bars clearing each current threshold. Move the threshold that your method actually uses — Z-score and impact for the Impact method.</li>
+    <li>Change one input at a time and give it at least two full sessions before judging.</li>
+    <li>Do not raise <code>InpLookbackBars</code> to get a steadier number (see §3).</li>
+    <li>After 100+ CSV rows, send the file over and it can be analysed properly: outcome by session, by HVN filter, by stacked, by threshold.</li>
+  </ol>
+</section>
+
+<section id="gate">
+  <p class="kicker">Section 13</p>
+  <h2>Risk rules and the gate</h2>
+  <h3>Rules for every session</h3>
+  <ul>
+    <li><strong>1% of the account per trade</strong>, at most.</li>
+    <li><strong>Three losers and you stop</strong> for the night. Close the platform.</li>
+    <li><strong>Flat by 04:00</strong> Malaysia time. Never hold while asleep.</li>
+    <li><strong>At least 1:2 reward-to-risk.</strong> At the measured hit rates, less than that loses by arithmetic.</li>
+    <li><strong>No level, no trade.</strong></li>
+  </ul>
+
+  <h3>Say these six out loud before clicking</h3>
+  <ul class="checklist">
+    <li>Which exact level am I trading against, and what is it?</li>
+    <li>Is price inside, above or below value — and does my trade agree?</li>
+    <li>Where exactly is my stop, and what price would prove the idea wrong?</li>
+    <li>Where is my target, and is it a level I can name (for Setup A: the opposite value edge)?</li>
+    <li>Is the reward at least twice the risk?</li>
+    <li>What is my lot size, calculated?</li>
+  </ul>
+
+  <div class="callout warn">
+    <div class="t">The gate before real money</div>
+    <p><strong>100 sim trades</strong>, each journaled against its written setup. <strong>Positive expectancy after costs</strong>, spread included. <strong>95% rule-following</strong> — a winning trade that broke the rules counts as a failure for this purpose. Until all three are met, everything here stays in sim.</p>
+  </div>
+</section>
+
+<section id="evidence">
+  <p class="kicker">Section 14</p>
+  <h2>Evidence summary</h2>
+  <div class="callout warn">
+    <div class="t">All in-sample</div>
+    <p>Every level and absorption result below is in-sample: no hold-out period, no repeat on unseen data, and no correction for testing about nine hypotheses plus a 12-setting absorption grid on the same history. The candlestick row is the exception — rules set in advance, 2024–2026 held out.</p>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>Claim</th><th>Verdict</th><th>Measured</th><th>How it was measured (exit rule)</th></tr></thead>
+    <tbody>
+      <tr><td>Price lingers at HVN, travels through LVN</td><td><span class="grade g-no">Not supported</span></td><td class="num">−0.2 bars vs mirrored control</td><td>Levels from the prior session; M5 bars inside a $3 band counted over the next session. Not a trade. Control: same levels mirrored across the open.</td></tr>
+      <tr><td>Value-area fill ("80% rule")</td><td><span class="grade g-part">Partly</span></td><td class="num">43.9% vs 35.4% base</td><td>Entry at the close of the 6th inside M5 bar. Outcome: opposite edge touched before server-day end. No stop, no time exit, no P&amp;L. Base rate unconditional.</td></tr>
+      <tr><td>POC is a magnet</td><td><span class="grade g-no">Not supported</span></td><td class="num">66.7% vs 66.2% control</td><td>Prior POC touched at any time next session, vs a level mirrored across the open.</td></tr>
+      <tr><td>Fade the value-area high</td><td><span class="grade g-no">Not supported</span></td><td class="num">−57 points (−$0.57), 50% win</td><td>Fill at the level on first touch; exit at the close 12 M5 bars later. No stop, no target, gross.</td></tr>
+      <tr><td>Fade the value-area low</td><td><span class="grade g-no">Not supported</span></td><td class="num">5 of 7 years flat/negative</td><td>Same as VAH, long side; by-year figures net of a 36-point spread.</td></tr>
+      <tr><td>Absorption predicts a reversal</td><td><span class="grade g-no">Not supported</span></td><td class="num">Negative mean, every setting</td><td>Entry at the signal bar's close, direction from the close position; exit at the close 12 bars later. No stop, target or costs. 2,000 bars, 12 settings.</td></tr>
+      <tr><td>CFD delta shows real pressure</td><td><span class="grade g-no">Not supported</span></td><td class="num">R² = 0.017</td><td>Tick-rule net ticks regressed on the same bar's close − open. Not a trade.</td></tr>
+      <tr><td>Candlestick patterns as entries (8 patterns, M5)</td><td><span class="grade g-no">Not supported</span></td><td class="num">net −0.06R to −0.37R; gross ≈ 0R</td><td>Enter at the next bar's open, stop beyond the pattern, exit at 2R or the 48th bar's close, $0.36 cost. Rules fixed first; 2019–23 dev, 2024–26 held out. §15.</td></tr>
+      <tr><td>SMC order blocks, FVGs, CHoCH</td><td><span class="grade g-un">Untested</span></td><td>—</td><td>—</td></tr>
+      <tr><td>Asian range sweep</td><td><span class="grade g-un">Untested</span></td><td>—</td><td>—</td></tr>
+      <tr><td>Time-of-day volume baseline fixes session-open floods</td><td><span class="grade g-un">Untested</span></td><td>—</td><td>Built 13 Sep 2026; check with the CSV</td></tr>
+    </tbody>
+  </table></div>
+  <p>One setup has a partly supported, in-sample touch rate and no measured payoff. Everything else is context to be proven — or dropped — in sim before it costs anything.</p>
+</section>
+
+<section id="candles">
+  <p class="kicker">Section 15</p>
+  <h2>Candlestick entries</h2>
+  <p>This section teaches you to read candles and to spot the four patterns most often taught as entries — and shows what happened when each one was traded mechanically on your gold feed. Learn to read them; do not trade them on their own.</p>
+
+  <div class="callout stop">
+    <div class="t">Tested before this was written — none pass</div>
+    <p>Eight pattern rules (four patterns, each in both directions) were fixed in advance and run on XAUUSD M5, with 2024–2026 kept back as an unseen check. <strong>Before costs every one averaged about 0R</strong> — the same as entering on a random bar. <strong>After the $0.36 spread every one lost</strong>, from −0.06R to −0.37R per trade, in both periods. The full table is below.</p>
+  </div>
+
+  <h3>Reading one candle</h3>
+  <p>A candle is a summary of one fight between buyers and sellers over a fixed time — five minutes on M5. Four prices build it, and the most informative is <strong>where the close sits inside the range</strong>.</p>
+  <div class="anatomy">
+    <svg viewBox="0 0 260 200" role="img" aria-label="Anatomy of an up candle: high at the top of the upper wick, close at the top of the body, open at the bottom of the body, low at the bottom of the lower wick">
+      <line class="wick" x1="80" y1="20" x2="80" y2="180"/>
+      <rect class="up" x="58" y="55" width="44" height="80" rx="2"/>
+      <line class="guide" x1="110" y1="20" x2="150" y2="20"/><text class="lbl" x="156" y="23">high</text>
+      <line class="guide" x1="110" y1="55" x2="150" y2="55"/><text class="lbl" x="156" y="58">close (up candle)</text>
+      <line class="guide" x1="110" y1="135" x2="150" y2="135"/><text class="lbl" x="156" y="138">open</text>
+      <line class="guide" x1="110" y1="180" x2="150" y2="180"/><text class="lbl" x="156" y="183">low</text>
+      <text class="lbl-b" x="8" y="42">upper</text><text class="lbl-b" x="8" y="54">wick</text>
+      <text class="lbl-b" x="8" y="98">body</text>
+      <text class="lbl-b" x="8" y="156">lower</text><text class="lbl-b" x="8" y="168">wick</text>
+    </svg>
+    <dl>
+      <dt>Body</dt><dd>Open to close. Green when close is above open, red when below. A big body means one side controlled the whole period.</dd>
+      <dt>Wicks</dt><dd>Prices reached but not held. A long lower wick means sellers pushed down and were pushed back.</dd>
+      <dt>Range</dt><dd>High to low. Compare it with the last 14 candles (ATR) — a pattern made of tiny candles means almost nothing.</dd>
+      <dt>Close location</dt><dd>(close − low) ÷ range. Near 1 = buyers finished in control; near 0 = sellers did.</dd>
+    </dl>
+  </div>
+
+  <h3>The four patterns, exactly as tested</h3>
+  <p>Each card gives the precise rule, where the stop goes, and the measured result: average R per trade after the spread, on the 2019–2023 data and on the held-back 2024–2026 data.</p>
+
+  <div class="patterns">
+    <article class="pattern">
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="Bullish engulfing: a decline, a small red candle, then a larger green candle whose body covers the red body">
+        <line class="wick" x1="40" y1="20" x2="40" y2="60"/><rect class="ghost" x="30" y="28" width="20" height="26"/>
+        <line class="wick" x1="80" y1="40" x2="80" y2="82"/><rect class="ghost" x="70" y="46" width="20" height="28"/>
+        <line class="wick" x1="130" y1="62" x2="130" y2="110"/><rect class="dn" x="118" y="72" width="24" height="26" rx="1"/>
+        <line class="wick" x1="180" y1="50" x2="180" y2="116"/><rect class="up" x="164" y="58" width="32" height="48" rx="1"/>
+        <line class="guide" x1="110" y1="116" x2="280" y2="116"/><text class="lbl-b" x="206" y="130">stop: lower low</text>
+        <text class="lbl" x="214" y="62">engulfs the</text><text class="lbl" x="214" y="74">red body</text>
+      </svg></figure>
+      <h4>Engulfing</h4>
+      <div class="body">
+        <p><strong>Bullish:</strong> after a decline, a red candle is followed by a green candle that opens at or below the red close and closes at or above the red open, with a bigger body, and a range of at least half the ATR. <strong>Bearish</strong> is the mirror after an advance.</p>
+        <p><strong>Meant to show:</strong> the side in control got completely overturned in one bar.</p>
+        <p><strong>Stop:</strong> beyond the more extreme of the two candles.</p>
+      </div>
+      <div class="res"><div><span>2019–23 · bull / bear</span><b>−0.35R / −0.33R</b></div><div><span>2024–26 · bull / bear</span><b>−0.15R / −0.18R</b></div></div>
+    </article>
+
+    <article class="pattern">
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="Hammer: after a decline, a candle with a small body near the top and a lower wick at least 60 percent of its range">
+        <line class="wick" x1="40" y1="12" x2="40" y2="48"/><rect class="ghost" x="30" y="18" width="20" height="24"/>
+        <line class="wick" x1="80" y1="30" x2="80" y2="66"/><rect class="ghost" x="70" y="36" width="20" height="24"/>
+        <line class="wick" x1="140" y1="46" x2="140" y2="124"/><rect class="up" x="128" y="50" width="24" height="16" rx="1"/>
+        <line class="guide" x1="160" y1="66" x2="175" y2="66"/><line class="guide" x1="160" y1="124" x2="175" y2="124"/>
+        <text class="lbl" x="182" y="98">lower wick ≥ 60%</text><text class="lbl" x="182" y="110">of the range</text>
+        <line class="guide" x1="110" y1="124" x2="160" y2="124"/><text class="lbl-b" x="182" y="130">stop: the low</text>
+      </svg></figure>
+      <h4>Hammer / shooting star</h4>
+      <div class="body">
+        <p><strong>Hammer:</strong> after a decline, lower wick at least 60% of the range, body at most 30%, upper wick at most 15%, range at least 0.8 × ATR. <strong>Shooting star</strong> is the mirror after an advance — a long upper wick.</p>
+        <p><strong>Meant to show:</strong> one side drove price hard and was rejected before the bar closed.</p>
+        <p><strong>Stop:</strong> beyond the wick's end.</p>
+      </div>
+      <div class="res"><div><span>2019–23 · hammer / star</span><b>−0.37R / −0.35R</b></div><div><span>2024–26 · hammer / star</span><b>−0.19R / −0.24R</b></div></div>
+    </article>
+
+    <article class="pattern">
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="Inside-bar breakout: a large mother candle, a smaller candle inside its range, then a candle closing above the mother's high">
+        <line class="wick" x1="70" y1="24" x2="70" y2="118"/><rect class="dn" x="54" y="38" width="32" height="64" rx="1"/>
+        <line class="wick" x1="120" y1="46" x2="120" y2="96"/><rect class="up" x="110" y="58" width="20" height="24" rx="1"/>
+        <line class="wick" x1="170" y1="8" x2="170" y2="80"/><rect class="up" x="158" y="14" width="24" height="56" rx="1"/>
+        <line class="guide" x1="40" y1="24" x2="280" y2="24"/><text class="lbl" x="196" y="20">close above mother high</text>
+        <line class="guide" x1="40" y1="118" x2="280" y2="118"/><text class="lbl-b" x="196" y="132">stop: mother low</text>
+      </svg></figure>
+      <h4>Inside-bar breakout</h4>
+      <div class="body">
+        <p>A candle sits completely inside the previous candle's range (the "mother"). The next candle <strong>closes</strong> beyond the mother's high (long) or low (short) — a wick poking through does not count.</p>
+        <p><strong>Meant to show:</strong> a pause, then a decision.</p>
+        <p><strong>Stop:</strong> the other side of the mother candle.</p>
+      </div>
+      <div class="res"><div><span>2019–23 · up / down</span><b>−0.30R / −0.32R</b></div><div><span>2024–26 · up / down</span><b>−0.06R / −0.16R</b></div></div>
+    </article>
+
+    <article class="pattern">
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="Morning star: a long red candle, a small candle, then a long green candle closing above the midpoint of the red body">
+        <line class="wick" x1="70" y1="14" x2="70" y2="96"/><rect class="dn" x="56" y="20" width="28" height="68" rx="1"/>
+        <line class="wick" x1="120" y1="88" x2="120" y2="126"/><rect class="up" x="110" y="102" width="20" height="8" rx="1"/>
+        <line class="wick" x1="170" y1="40" x2="170" y2="104"/><rect class="up" x="156" y="44" width="28" height="54" rx="1"/>
+        <line class="guide" x1="40" y1="54" x2="280" y2="54"/><text class="lbl" x="196" y="50">closes above the red</text><text class="lbl" x="196" y="68">body's midpoint</text>
+        <line class="guide" x1="40" y1="126" x2="280" y2="126"/><text class="lbl-b" x="196" y="138">stop: lowest low</text>
+      </svg></figure>
+      <h4>Morning / evening star</h4>
+      <div class="body">
+        <p><strong>Morning star:</strong> a long red candle (body at least 60% of its range, range at least 1 ATR), then a small candle (body at most 30% of its range, range at most 60% of the first), then a green candle closing above the first candle's body midpoint. <strong>Evening star</strong> is the mirror.</p>
+        <p><strong>Meant to show:</strong> momentum, exhaustion, then reversal over three bars.</p>
+        <p><strong>Stop:</strong> beyond the extreme of all three candles.</p>
+      </div>
+      <div class="res"><div><span>2019–23 · morning / evening</span><b>−0.27R / −0.31R</b></div><div><span>2024–26 · morning / evening</span><b>−0.24R / −0.10R</b></div></div>
+    </article>
+  </div>
+
+  <h3>Full results</h3>
+  <p>R = the trade's result divided by the distance from entry to stop. <strong>Gross</strong> is before the spread; <strong>net</strong> is after. Win % is net trades above zero.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Pattern</th><th>Signals / day</th><th>2019–23 gross</th><th>2019–23 net</th><th>2024–26 gross</th><th>2024–26 net</th><th>2024–26 win</th></tr></thead>
+    <tbody>
+      <tr><td>Engulfing bull</td><td class="num">12.1</td><td class="num">−0.03R</td><td class="num">−0.35R</td><td class="num">+0.02R</td><td class="num">−0.15R</td><td class="num">34.5%</td></tr>
+      <tr><td>Engulfing bear</td><td class="num">11.9</td><td class="num">−0.00R</td><td class="num">−0.33R</td><td class="num">+0.00R</td><td class="num">−0.18R</td><td class="num">33.7%</td></tr>
+      <tr><td>Hammer</td><td class="num">3.4</td><td class="num">−0.03R</td><td class="num">−0.37R</td><td class="num">−0.01R</td><td class="num">−0.19R</td><td class="num">33.5%</td></tr>
+      <tr><td>Shooting star</td><td class="num">3.1</td><td class="num">+0.00R</td><td class="num">−0.35R</td><td class="num">−0.05R</td><td class="num">−0.24R</td><td class="num">32.0%</td></tr>
+      <tr><td>Inside-bar breakout up</td><td class="num">7.3</td><td class="num">−0.05R</td><td class="num">−0.30R</td><td class="num">+0.07R</td><td class="num">−0.06R</td><td class="num">37.4%</td></tr>
+      <tr><td>Inside-bar breakout down</td><td class="num">7.1</td><td class="num">−0.06R</td><td class="num">−0.32R</td><td class="num">−0.03R</td><td class="num">−0.16R</td><td class="num">33.4%</td></tr>
+      <tr><td>Morning star</td><td class="num">1.4</td><td class="num">+0.02R</td><td class="num">−0.27R</td><td class="num">−0.09R</td><td class="num">−0.24R</td><td class="num">31.1%</td></tr>
+      <tr><td>Evening star</td><td class="num">1.4</td><td class="num">−0.04R</td><td class="num">−0.31R</td><td class="num">+0.04R</td><td class="num">−0.10R</td><td class="num">35.5%</td></tr>
+      <tr><td><strong>Random bar (baseline)</strong></td><td class="num">—</td><td class="num">−0.03R</td><td class="num">−0.43R</td><td class="num">−0.06R</td><td class="num">−0.34R</td><td class="num">31.6%</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Why they fail on this chart</h3>
+  <ul>
+    <li><strong>No direction in the pattern.</strong> Gross results sit within a few hundredths of 0R, like the random-bar baseline. With a 2R target you break even at about 33% wins, and that is roughly what every pattern — and a coin — delivers.</li>
+    <li><strong>The spread is large next to an M5 stop.</strong> The net figures are 0.15–0.35R below gross, which means $0.36 is roughly a fifth to a third of the typical pattern stop. The patterns look "less bad" than the random-bar baseline after costs because their stops span two or three candles, so the spread is a smaller share of R — not because they predict better (gross is the same).</li>
+    <li><strong>They are common.</strong> Engulfing candles appear about 12 times a day in each direction. Something that frequent cannot carry much information.</li>
+    <li>Net results are closer to zero in 2024–26 while gross results are not better, so the difference comes from the cost side: the same $0.36 is a smaller share of each stop. Gold's wider 2024–26 ranges are the likely reason; stop sizes by period were not separately measured.</li>
+  </ul>
+
+  <h3>How to spot them live anyway</h3>
+  <p>Reading candles well is still a real skill: it tells you who won the last few minutes and keeps you from entering in the middle of a move. If you use a pattern, use it only to <em>time</em> a trade you already have a reason for — at a named level from §8 — and treat that combination as untested until your sim log says otherwise.</p>
+  <ol class="steps">
+    <li><div><b>Wait for the close</b>A pattern does not exist until the candle closes. A hammer at 4 minutes 30 seconds can close as a plain red bar.</div></li>
+    <li><div><b>Check the size</b>The pattern candle's range should be at least the recent average (ATR). Small candles are noise.</div></li>
+    <li><div><b>Check what came before</b>A reversal pattern needs something to reverse: a clear move into it over the last five or so candles.</div></li>
+    <li><div><b>Check the location</b>Is it at a level you named before the session? If not, it is one of a dozen similar candles today — skip it.</div></li>
+    <li><div><b>Check the cost</b>Stop distance at least $1.80 (five spreads), so the spread is at most 0.2R. If the pattern's natural stop is tighter, do not tighten further — skip the trade.</div></li>
+    <li><div><b>Enter on the next candle</b>Market at the next candle's open, stop beyond the pattern extreme, target at 2R or the next named level. Log it in the journal as "candle-timed".</div></li>
+  </ol>
+
+  <h3>Mistakes that make it worse</h3>
+  <ul class="checklist">
+    <li>Seeing the pattern on a still-forming candle and entering early.</li>
+    <li>Moving the stop inside the pattern to make the position size bigger.</li>
+    <li>Counting a wick through a level as a breakout — the test used closes.</li>
+    <li>Reading M1 candles for patterns: the spread is an even larger part of an M1 stop.</li>
+    <li>Remembering the patterns that worked and forgetting the ones that did not. Log every one you would have taken.</li>
+  </ul>
+
+  <h3>Practice drill</h3>
+  <ol>
+    <li>Open the Strategy Tester (Ctrl+R), pick any EA or indicator, set XAUUSD M5, tick <strong>Visual mode</strong>, and choose a past week.</li>
+    <li>Play at a slow speed. Each time you see one of the four patterns, pause and write down: time, pattern, direction, whether it was at a named level, entry, stop, 2R target.</li>
+    <li>Resume and record what happened.</li>
+    <li>After 50 patterns, compare the ones at a named level with the ones that were not. That comparison is the untested question worth your time.</li>
+  </ol>
+
+  <div class="callout">
+    <div class="t">How this was tested</div>
+    <p>XAUUSD M5 on this feed, 6 Aug 2019 – 11 Sep 2026. Rules above written into the script before it ran. Entry at the open of the candle after the pattern; stop beyond the pattern extreme (skipped if under $0.50); exit at +2R, at the stop, or at the close of the 48th candle (4 hours). If a candle touched both stop and target it counted as a stop. Cost: $0.36 per trade. Pass rule set in advance: positive net R with t &gt; 2 in both 2019–2023 and 2024–2026, and above a random-bar baseline (60,000 random candles, random direction, stop at that candle's own low or high). Eight rules tested; all eight failed in both periods. The fixed $0.36 may overstate cost in the cheaper early years, but gross results are near zero regardless.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  Sources: README.md and TRADING_GUIDE.md in Futures\MT5_OrderFlow, and the indicator source. OF_Heatmap contains work adapted from LuxAlgo, licensed CC BY-NC-SA 4.0 — personal use and modification, no resale.
+</footer>

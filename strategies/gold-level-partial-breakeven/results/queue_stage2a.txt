@@ -1,0 +1,7 @@
+# plan v2 step 2a: partial profit + breakeven with ATR-sized stops
+--name 1A --window A
+--name 2A --window A
+--name 3A --window A
+--name 1A --window B
+--name 2A --window B
+--name 3A --window B

@@ -1,0 +1,2 @@
+# plan v2 step 2c: B* = 1A; improvements that beat B* in both windows: none
+# F = 1A (already run, no new runs)

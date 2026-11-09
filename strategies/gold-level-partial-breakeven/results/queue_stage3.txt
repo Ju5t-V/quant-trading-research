@@ -1,0 +1,7 @@
+# plan v2 step 3: dev-gated configs none; stress runs for ['1A']
+--name 1A --window A --stress --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name 1A --window B --stress --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name 1A --window A --raw --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name 1A --window B --raw --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name 0b --window A --raw 
+--name 0b --window B --raw 

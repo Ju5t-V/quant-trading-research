@@ -1,0 +1,5 @@
+# plan v2 step 4 (holdout, run once): winner = NONE
+# nothing passed the gates; holdout runs F, 0b and R for information only, as planned
+--name 0b --window C --feed duka 
+--name R --window C --feed duka --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5
+--name 1A --window C --feed duka --set levels=PDH_PDL --set arm_hour=0 --set arm_minute=5

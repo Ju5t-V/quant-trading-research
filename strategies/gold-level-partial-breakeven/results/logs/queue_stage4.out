@@ -1,0 +1,7 @@
+start name_0b_window_C_feed_duka
+start name_R_window_C_feed_duka_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+start name_1A_window_C_feed_duka_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5
+done  name_0b_window_C_feed_duka  exit=0  1657s
+done  name_1A_window_C_feed_duka_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  1677s
+done  name_R_window_C_feed_duka_set_levels-PDH_PDL_set_arm_hour-0_set_arm_minute-5  exit=0  1692s
+all done in 1697s

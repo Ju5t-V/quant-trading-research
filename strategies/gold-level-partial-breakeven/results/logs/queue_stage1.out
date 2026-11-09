@@ -1,0 +1,23 @@
+start name_0b_window_A
+start name_1_window_A
+start name_2_window_A
+done  name_2_window_A  exit=0  1045s
+start name_3_window_A
+done  name_0b_window_A  exit=0  1050s
+done  name_1_window_A  exit=0  1050s
+start name_0a_window_A
+start name_0b_window_B
+done  name_0b_window_B  exit=0  435s
+start name_1_window_B
+done  name_1_window_B  exit=0  450s
+start name_2_window_B
+done  name_3_window_A  exit=0  1080s
+start name_3_window_B
+done  name_0a_window_A  exit=0  1080s
+start name_0a_window_B
+done  name_2_window_B  exit=0  445s
+start name_1_window_B_first_2019-01_last_2019-03
+done  name_1_window_B_first_2019-01_last_2019-03  exit=0  35s
+done  name_3_window_B  exit=0  425s
+done  name_0a_window_B  exit=0  420s
+all done in 2566s

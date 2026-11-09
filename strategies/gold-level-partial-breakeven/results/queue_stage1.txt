@@ -1,0 +1,14 @@
+# Stage 1 of the pre-registered matrix on CLEAN ticks (clean_ticks.py):
+# baselines + configs 1-3 on both dev windows. Window A (~140M ticks) first.
+--name 0b --window A
+--name 1 --window A
+--name 2 --window A
+--name 3 --window A
+--name 0a --window A
+--name 0b --window B
+--name 1 --window B
+--name 2 --window B
+--name 3 --window B
+--name 0a --window B
+# fidelity check: Q1 2019 on clean ticks, to compare with the M1-bar run in results/timing
+--name 1 --window B --first 2019-01 --last 2019-03

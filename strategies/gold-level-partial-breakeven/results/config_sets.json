@@ -1,0 +1,44 @@
+{
+  "1A": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "2A": {
+    "levels": "ASIA"
+  },
+  "3A": {
+    "levels": "PDH_PDL",
+    "arm_hour": 6,
+    "arm_minute": 0
+  },
+  "B*": "1A",
+  "E1": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "E2": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "E3": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "E4": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "R": {
+    "levels": "PDH_PDL",
+    "arm_hour": 0,
+    "arm_minute": 5
+  },
+  "F_alias": "1A",
+  "winner": null,
+  "holdout_config": "1A"
+}

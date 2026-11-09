@@ -1,0 +1,37 @@
+=== 1. ticks per month (clean)
+      count       sum      min     median
+year                                     
+2020      3  12175653  3668950  4248307.0
+2021     12  53097956  3436393  4348967.5
+2022     12  53849024  3391069  4448175.5
+2023     12  36415719  1892643  2899183.5
+2024     12  56216524  2125957  5105821.5
+2025      4  23171111  5396499  5806988.5
+months with < 30% of the median tick count: none
+cleaning removed 3,634 of 234,929,621 ticks (0.002%); worst month 202108 (0.046%)
+
+=== 2. Dukascopy vs MetaQuotes daily bars (same server day)
+      days  high_med  high_p95  low_med  low_p95  close_med  within_1usd_pct
+year                                                                        
+2021   258      0.09      0.21     0.13     0.39       0.36            98.06
+2022   258      0.11      0.24     0.14     0.53       0.35            98.45
+2023   257      0.12      0.23     0.11     0.56       0.34            98.83
+2024   259      0.09      0.23     0.11     0.41       0.26            99.23
+2025    84      0.15      0.39     0.26     0.87       0.51           100.00
+largest daily differences:
+            high_duka  high_mt5  low_duka  low_mt5      w
+srv_ms                                                   
+2023-05-04    2079.78   2066.81   2030.21  2030.38  12.97
+2021-01-18    1840.68   1840.72   1802.95  1810.29   7.34
+2022-03-14    1990.31   1983.64   1949.63  1949.70   6.67
+2023-11-14    1970.84   1970.87   1937.98  1943.76   5.78
+2024-07-05    2392.82   2392.91   2347.52  2352.30   4.79
+
+=== 3. median spread by year (points)
+{'2020': 38.4, '2021': 35.1, '2022': 36.2, '2023': 33.4, '2024': 38.9, '2025': 53.8}
+
+=== 4. session reopen time in UTC (Europe/Athens server rule)
+1132 weekdays: 98.6% first tick within 15 min after the expected reopen; one-hour offsets: 11
+
+=== 5. hours still missing after retries
+0 failed hours

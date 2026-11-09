@@ -1,0 +1,7 @@
+# Step 5 (Jerry's pick, 2026-09-16): rollover guard.
+# G = 0b (Jerry's exits at 1% risk) with the orders placed at 01:15 server instead of 00:05,
+# i.e. after the 01:00 reopen. Compare with 0b_A, 0b_B, 0b_A_raw and 0b_B_raw.
+--name G --window A
+--name G --window B
+--name G --window A --raw
+--name G --window B --raw
